@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Головна - Мій блог</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .container { width: 80%; margin: auto; padding: 20px; }
+        .post { border-bottom: 1px solid #ddd; padding: 10px 0; }
+        .navbar { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin: 0 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="{% url 'post_list' %}">🏠 Головна</a>
+        <a href="{% url 'add_post' %}">➕ Додати пост</a>
+    </div>
+
+    <div class="container">
+        <h1>📝 Останні пости</h1>
+
+        {% for post in posts %}
+            <div class="post">
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content }}</p>
+                <p><small>🕒 Опубліковано: {{ post.created_at }}</small></p>
+            </div>
+        {% empty %}
+            <p>😢 Поки що немає постів...</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
