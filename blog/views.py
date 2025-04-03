@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post
 from .forms import PostForm
 
@@ -15,3 +15,8 @@ def add_post(request):
     else:
         form = PostForm()
     return render(request, 'blog/add_post.html', {'form': form})
+
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    post.delete()
+    return redirect('post_list')  # Повернення на головну сторінку після видалення

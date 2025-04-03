@@ -9,6 +9,7 @@
         .post { border-bottom: 1px solid #ddd; padding: 10px 0; }
         .navbar { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .navbar a { color: white; text-decoration: none; margin: 0 10px; }
+        .delete-btn { color: red; text-decoration: none; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -26,6 +27,7 @@
                 <h2>{{ post.title }}</h2>
                 <p>{{ post.content }}</p>
                 <p><small>🕒 Опубліковано: {{ post.created_at }}</small></p>
+                <a href="{% url 'delete_post' post.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей пост?')">❌ Видалити</a>
             </div>
         {% empty %}
             <p>😢 Поки що немає постів...</p>
