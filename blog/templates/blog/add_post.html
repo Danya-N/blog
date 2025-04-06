@@ -8,6 +8,16 @@
         .container { width: 80%; margin: auto; padding: 20px; }
         .navbar { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .navbar a { color: white; text-decoration: none; margin: 0 10px; }
+
+        /* Стиль для посилання без підкреслення */
+        .no-underline {
+            text-decoration: none;
+            color: purple;
+        }
+
+        .no-underline:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -25,7 +35,7 @@
             <button type="submit">✅ Опублікувати</button>
         </form>
         <br>
-        <a href="{% url 'post_list' %}">🔙 Назад до списку постів</a>
+        <a href="{% url 'post_list' %}" class="no-underline">🔙 Назад до списку постів</a>
     </div>
 
 </body>
