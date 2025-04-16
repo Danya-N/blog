@@ -10,6 +10,26 @@
         .navbar { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .navbar a { color: white; text-decoration: none; margin: 0 10px; }
         .delete-btn { color: red; text-decoration: none; margin-left: 10px; }
+
+        .comment-field {
+            width: 50%;
+            height: 50px;
+            resize: none;
+        }
+
+        .comment-form {
+            margin-top: 10px;
+        }
+
+        .heart {
+            font-size: 20px;
+            cursor: pointer;
+            color: gray;
+        }
+
+        .liked {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -27,12 +47,68 @@
                 <h2>{{ post.title }}</h2>
                 <p>{{ post.content }}</p>
                 <p><small>🕒 Опубліковано: {{ post.created_at }}</small></p>
+
+                <!-- Лайк посту -->
+                <span class="heart" data-post-id="{{ post.id }}">
+                    ❤️ <span id="like-count-{{ post.id }}">{{ post.like_count }}</span>
+                </span>
+
                 <a href="{% url 'delete_post' post.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей пост?')"> Видалити</a>
+
+                <!-- Форма для додавання коментаря -->
+                <div class="comment-form">
+                    <form method="post" action="{% url 'add_comment' post.id %}">
+                        {% csrf_token %}
+                        <textarea name="content" class="comment-field" placeholder="Напишіть коментар..."></textarea><br>
+                        <button type="submit">Додати коментар</button>
+                    </form>
+                </div>
+
+                <!-- Виведення коментарів -->
+                <div class="comments">
+                    {% for comment in post.comments.all %}
+                        <div class="comment">
+                            <p>{{ comment.content }}</p>
+                            <p><small>{{ comment.created_at }}</small></p>
+                            <a href="{% url 'delete_comment' comment.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей коментар?')">Видалити коментар</a>
+                        </div>
+                    {% empty %}
+                        <p>Немає коментарів.</p>
+                    {% endfor %}
+                </div>
             </div>
         {% empty %}
             <p>😢 Поки що немає постів...</p>
         {% endfor %}
     </div>
+
+    <!-- JS для лайків -->
+    <script>
+        document.querySelectorAll('.heart').forEach(heart => {
+            heart.addEventListener('click', function () {
+                const postId = this.getAttribute('data-post-id');
+
+                fetch(`/like/${postId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const likeCount = document.getElementById(`like-count-${postId}`);
+                    likeCount.textContent = data.likes;
+
+                    if (data.liked) {
+                        this.classList.add('liked');
+                    } else {
+                        this.classList.remove('liked');
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
