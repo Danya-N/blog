@@ -3,6 +3,8 @@ from django.db import models
 class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Для зображення
+    video = models.FileField(upload_to='post_videos/', blank=True, null=True)  # Для відео
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -21,7 +23,7 @@ class Comment(models.Model):
 
 class Like(models.Model):
     post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
-    session_key = models.CharField(max_length=40)  # унікально для сесії (оскільки без користувачів)
+    session_key = models.CharField(max_length=40)  # унікально для сесії
 
     class Meta:
         unique_together = ('post', 'session_key')

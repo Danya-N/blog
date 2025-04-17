@@ -9,7 +9,7 @@ def post_list(request):
 
 def add_post(request):
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)  # додаємо request.FILES для обробки файлів
         if form.is_valid():
             form.save()
             return redirect('post_list')
@@ -44,7 +44,7 @@ def like_post(request, post_id):
     # Перевірка, чи вже є лайк для цього поста
     like, created = Like.objects.get_or_create(post=post, session_key=session_key)
     
-    if not created:  # Якщо лайк уже існує, видаляємо його
+    if not created:  # Якщо лайк вже існує, видаляємо його
         like.delete()
         liked = False
     else:

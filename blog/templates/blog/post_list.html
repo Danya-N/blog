@@ -2,46 +2,31 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Головна - Мій блог</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <title>Мій блог</title>
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --navbar-bg: #333;
-            --post-border: #ddd;
-        }
-
-        body.dark-theme {
-            --bg-color: #2c2c2c;
-            --text-color: #f0f0f0;
-            --navbar-bg: #1e1e1e;
-            --post-border: #555;
-        }
-
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: white;
+            color: black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-theme {
+            background-color: #2c2c2c;
+            color: #f0f0f0;
         }
 
         .container {
-            width: 80%;
-            margin: auto;
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
             padding: 20px;
         }
 
-        .post {
-            border-bottom: 1px solid var(--post-border);
-            padding: 10px 0;
-            position: relative;
-        }
-
         .navbar {
-            background: var(--navbar-bg);
+            background: #333;
             padding: 15px;
             display: flex;
             justify-content: space-between;
@@ -54,154 +39,190 @@
             margin: 0 10px;
         }
 
-        .theme-toggle-btn {
-            background-color: transparent;
-            border: 1px solid white;
+        .theme-toggle {
+            background: #555;
             color: white;
+            border: none;
             padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .post {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .dark-theme .post {
+            background-color: #3b3b3b;
+        }
+
+        .post img, .post video {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .comment-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        .comment {
+            background: #eaeaea;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dark-theme .comment {
+            background: #555;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .comment-form input[type="text"] {
+            flex-grow: 1;
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .comment-form button {
+            padding: 6px 12px;
+            border: none;
+            background-color: purple;
+            color: white;
             border-radius: 5px;
             cursor: pointer;
         }
 
-        .delete-btn {
+        .no-underline {
+            text-decoration: none;
+            color: purple;
+        }
+
+        .no-underline:hover {
+            text-decoration: underline;
+        }
+
+        .delete-button {
+            background: none;
+            border: none;
             color: red;
             font-size: 18px;
-            text-decoration: none;
-            position: absolute;
-            top: 5px; /* Зміщуємо кнопку вверх */
-            right: 10px;
-        }
-
-        .delete-btn i {
-            transition: transform 0.2s;
-        }
-
-        .delete-btn:hover i {
-            transform: scale(1.2);
-        }
-
-        .comment-field {
-            width: 50%;
-            height: 50px;
-            resize: none;
-        }
-
-        .comment-form {
-            margin-top: 10px;
-        }
-
-        .heart {
-            font-size: 20px;
             cursor: pointer;
-            color: gray;
         }
 
-        .liked {
-            color: red;
+        .post-delete-form {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
     </style>
 </head>
 <body>
+
     <div class="navbar">
         <div>
             <a href="{% url 'post_list' %}">🏠 Головна</a>
             <a href="{% url 'add_post' %}">➕ Додати пост</a>
         </div>
-        <button class="theme-toggle-btn" onclick="toggleTheme()">🌓 Змінити тему</button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Змінити тему</button>
     </div>
 
     <div class="container">
-        <h1>📝 Останні пости</h1>
-
         {% for post in posts %}
-            <div class="post">
+            <div class="post" id="post-{{ post.id }}">
+                <!-- Кнопка видалення посту в правому куті -->
+                <form class="post-delete-form" action="{% url 'delete_post' post.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-button" title="Видалити пост">🗑️</button>
+                </form>
+
                 <h2>{{ post.title }}</h2>
                 <p>{{ post.content }}</p>
-                <p><small>🕒 Опубліковано: {{ post.created_at }}</small></p>
 
-                <!-- Лайк посту -->
-                <span class="heart" data-post-id="{{ post.id }}">
-                    ❤️ <span id="like-count-{{ post.id }}">{{ post.like_count }}</span>
-                </span>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="Зображення">
+                {% endif %}
 
-                <!-- Іконка видалення поста -->
-                <a href="{% url 'delete_post' post.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей пост?')">
-                    <i class="fas fa-trash"></i>
-                </a>
+                {% if post.video %}
+                    <video controls>
+                        <source src="{{ post.video.url }}" type="video/mp4">
+                        Ваш браузер не підтримує відео.
+                    </video>
+                {% endif %}
 
-                <!-- Форма для додавання коментаря -->
-                <div class="comment-form">
-                    <form method="post" action="{% url 'add_comment' post.id %}">
-                        {% csrf_token %}
-                        <textarea name="content" class="comment-field" placeholder="Напишіть коментар..."></textarea><br>
-                        <button type="submit">Додати коментар</button>
-                    </form>
+                <!-- Лайки -->
+                <div>
+                    <button class="like-btn" onclick="toggleLike({{ post.id }})" id="like-btn-{{ post.id }}">❤️</button>
+                    <span id="like-count-{{ post.id }}">{{ post.like_count }}</span> лайків
                 </div>
 
-                <!-- Виведення коментарів -->
-                <div class="comments">
+                <!-- Коментарі -->
+                <div class="comment-section">
+                    <h4>Коментарі:</h4>
                     {% for comment in post.comments.all %}
-                        <div class="comment-wrapper" style="position: relative; padding-bottom: 25px;">
-                            <div class="comment">
-                                <p>{{ comment.content }}</p>
-                                <p><small>{{ comment.created_at }}</small></p>
-                            </div>
-                            <!-- Іконка видалення коментаря -->
-                            <a href="{% url 'delete_comment' comment.id %}" class="delete-btn" style="position: absolute; bottom: 5px; right: 10px;" onclick="return confirm('Ви впевнені, що хочете видалити цей коментар?')">
-                                <i class="fas fa-trash"></i>
-                            </a>
+                        <div class="comment">
+                            {{ comment.content }}
+                            <form action="{% url 'delete_comment' comment.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-button" title="Видалити коментар">🗑️</button>
+                            </form>
                         </div>
                     {% empty %}
-                        <p>Немає коментарів.</p>
+                        <p>Коментарів ще немає.</p>
                     {% endfor %}
+
+                    <form class="comment-form" action="{% url 'add_comment' post.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="content" placeholder="Ваш коментар..." required>
+                        <button type="submit">💬</button>
+                    </form>
                 </div>
             </div>
-        {% empty %}
-            <p>😢 Поки що немає постів...</p>
         {% endfor %}
     </div>
 
-    <!-- JS для лайків -->
     <script>
-        document.querySelectorAll('.heart').forEach(heart => {
-            heart.addEventListener('click', function () {
-                const postId = this.getAttribute('data-post-id');
-
-                fetch(`/like/${postId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const likeCount = document.getElementById(`like-count-${postId}`);
-                    likeCount.textContent = data.likes;
-
-                    if (data.liked) {
-                        this.classList.add('liked');
-                    } else {
-                        this.classList.remove('liked');
-                    }
-                });
-            });
-        });
-
-        // Темна тема — збереження в localStorage
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
         }
 
-        // Застосувати тему при завантаженні
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
-        });
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        }
+
+        function toggleLike(postId) {
+            fetch(`/like/${postId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById(`like-count-${postId}`).textContent = data.likes;
+                });
+        }
     </script>
 </body>
 </html>
