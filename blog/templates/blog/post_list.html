@@ -3,13 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>Головна - Мій блог</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .container { width: 80%; margin: auto; padding: 20px; }
-        .post { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        .navbar { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .navbar a { color: white; text-decoration: none; margin: 0 10px; }
-        .delete-btn { color: red; text-decoration: none; margin-left: 10px; }
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --navbar-bg: #333;
+            --post-border: #ddd;
+        }
+
+        body.dark-theme {
+            --bg-color: #2c2c2c;
+            --text-color: #f0f0f0;
+            --navbar-bg: #1e1e1e;
+            --post-border: #555;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .post {
+            border-bottom: 1px solid var(--post-border);
+            padding: 10px 0;
+            position: relative;
+        }
+
+        .navbar {
+            background: var(--navbar-bg);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .theme-toggle-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            color: red;
+            font-size: 18px;
+            text-decoration: none;
+            position: absolute;
+            top: 5px; /* Зміщуємо кнопку вверх */
+            right: 10px;
+        }
+
+        .delete-btn i {
+            transition: transform 0.2s;
+        }
+
+        .delete-btn:hover i {
+            transform: scale(1.2);
+        }
 
         .comment-field {
             width: 50%;
@@ -33,10 +102,12 @@
     </style>
 </head>
 <body>
-
     <div class="navbar">
-        <a href="{% url 'post_list' %}">🏠 Головна</a>
-        <a href="{% url 'add_post' %}">➕ Додати пост</a>
+        <div>
+            <a href="{% url 'post_list' %}">🏠 Головна</a>
+            <a href="{% url 'add_post' %}">➕ Додати пост</a>
+        </div>
+        <button class="theme-toggle-btn" onclick="toggleTheme()">🌓 Змінити тему</button>
     </div>
 
     <div class="container">
@@ -53,7 +124,10 @@
                     ❤️ <span id="like-count-{{ post.id }}">{{ post.like_count }}</span>
                 </span>
 
-                <a href="{% url 'delete_post' post.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей пост?')"> Видалити</a>
+                <!-- Іконка видалення поста -->
+                <a href="{% url 'delete_post' post.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей пост?')">
+                    <i class="fas fa-trash"></i>
+                </a>
 
                 <!-- Форма для додавання коментаря -->
                 <div class="comment-form">
@@ -67,10 +141,15 @@
                 <!-- Виведення коментарів -->
                 <div class="comments">
                     {% for comment in post.comments.all %}
-                        <div class="comment">
-                            <p>{{ comment.content }}</p>
-                            <p><small>{{ comment.created_at }}</small></p>
-                            <a href="{% url 'delete_comment' comment.id %}" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей коментар?')">Видалити коментар</a>
+                        <div class="comment-wrapper" style="position: relative; padding-bottom: 25px;">
+                            <div class="comment">
+                                <p>{{ comment.content }}</p>
+                                <p><small>{{ comment.created_at }}</small></p>
+                            </div>
+                            <!-- Іконка видалення коментаря -->
+                            <a href="{% url 'delete_comment' comment.id %}" class="delete-btn" style="position: absolute; bottom: 5px; right: 10px;" onclick="return confirm('Ви впевнені, що хочете видалити цей коментар?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
                         </div>
                     {% empty %}
                         <p>Немає коментарів.</p>
@@ -108,7 +187,21 @@
                 });
             });
         });
-    </script>
 
+        // Темна тема — збереження в localStorage
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+
+        // Застосувати тему при завантаженні
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        });
+    </script>
 </body>
 </html>
