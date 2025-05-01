@@ -52,13 +52,62 @@
             background: #777;
         }
 
+        .burger {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-left: 10px;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 220px;
+            height: 100vh;
+            background: #444;
+            color: white;
+            padding: 20px;
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .side-menu.open {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .side-menu button,
+        .side-menu a {
+            padding: 10px 15px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
         .form-container {
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             background-color: #f9f9f9;
             transition: background-color 0.3s, color 0.3s;
-            margin-top: 50px; /* Відступ для переміщення форми вниз */
+            margin-top: 50px;
         }
 
         .dark-theme .form-container {
@@ -115,7 +164,7 @@
         }
 
         .form-container button:hover {
-            background-color: #7f3d92; /* Відтінок фіолетового при наведенні */
+            background-color: #7f3d92;
         }
 
         .form-container input[type="file"] {
@@ -135,7 +184,7 @@
         }
 
         .form-container .file-button:hover {
-            background-color: #7f3d92; /* Відтінок фіолетового при наведенні */
+            background-color: #7f3d92;
         }
 
         .dark-theme .form-container .file-button {
@@ -146,7 +195,6 @@
             background-color: #8e44ad;
         }
 
-        /* Стилі для кнопки "Назад до списку постів" */
         .back-button {
             display: inline-block;
             margin-top: 20px;
@@ -161,7 +209,7 @@
         }
 
         .back-button:hover {
-            background-color: #7f3d92; /* Відтінок фіолетового при наведенні */
+            background-color: #7f3d92;
         }
     </style>
 </head>
@@ -169,10 +217,17 @@
 
     <div class="navbar">
         <div>
-            <a href="{% url 'post_list' %}">🏠 Головна</a>
-            <a href="{% url 'add_post' %}">➕ Додати пост</a>
+
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Змінити тему</button>
+        <div style="display: flex; align-items: center;">
+            <button class="burger" onclick="toggleMenu()">☰</button>
+        </div>
+    </div>
+
+    <div class="side-menu" id="sideMenu">
+        <button onclick="toggleMenu()">✖ Закрити</button>
+        <button onclick="toggleTheme()">🌓 Змінити тему</button>
+        <a href="{% url 'post_list' %}">🏠 Головна</a>
     </div>
 
     <div class="container">
@@ -187,17 +242,13 @@
                 <label for="id_content">Контент:</label>
                 {{ form.content }}
 
-                <!-- Сховані кнопки для вибору файлів -->
                 <input type="file" id="id_image" name="image">
                 <input type="file" id="id_video" name="video">
 
-                <!-- Стилізовані кнопки -->
                 <label for="id_image" class="file-button">🖼️ Вибрати зображення</label>
                 <label for="id_video" class="file-button">🎥 Вибрати відео</label>
 
                 <button type="submit">🚀 Опублікувати</button>
-
-                <!-- Кнопка "Назад до списку постів" всередині форми -->
                 <a href="{% url 'post_list' %}" class="back-button">⬅️ Назад до списку постів</a>
             </form>
         </div>
@@ -212,6 +263,10 @@
             document.body.classList.toggle('dark-theme');
             const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
             localStorage.setItem('theme', theme);
+        }
+
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('open');
         }
     </script>
 </body>
