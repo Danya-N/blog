@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Профіль користувача</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0; /* світлий фон сторінки */
+      color: #121212; /* темний текст */
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Темна тема */
+    body.dark-theme {
+      background-color: #121212; /* темний фон сторінки */
+      color: #e0e0e0; /* світлий текст */
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      flex-grow: 1; /* щоб контент займав решту сторінки */
+    }
+
+    .profile-box {
+      border: 2px solid #bb86fc; /* світло-фіолетова підсвітка */
+      border-radius: 15px;
+      padding: 30px 40px;
+      box-shadow: 0 4px 15px rgba(187, 134, 252, 0.6);
+      background-color: #1e1e1e; /* темний фон рамки */
+      color: #e0e0e0; /* світлий текст у рамці */
+      max-width: 500px;
+      margin: 0 auto;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Темна тема - рамка профілю світліша */
+    body.dark-theme .profile-box {
+      background-color: #2c2c2c;
+      border-color: #bb86fc;
+      box-shadow: 0 4px 20px rgba(187, 134, 252, 0.9);
+    }
+
+    .profile-box h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #bb86fc;
+    }
+
+    .profile-box p {
+      font-size: 18px;
+      margin: 15px 0;
+    }
+
+    .profile-box p strong {
+      color: #d0aaff;
+    }
+
+    /* Посилання без підсвітки при наведенні */
+    .profile-box a {
+      display: inline-block;
+      margin-top: 20px;
+      color: #bb86fc;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 8px 16px;
+      border: 2px solid #bb86fc;
+      border-radius: 8px;
+      transition: none;
+    }
+
+    .profile-box a:hover,
+    .profile-box a:focus {
+      background-color: transparent;
+      color: #bb86fc;
+      border-color: #bb86fc;
+      cursor: default;
+    }
+
+    /* --- Оформлення шапки (navbar) як у другого варіанту --- */
+
+    .navbar {
+      background: #333;
+      padding: 15px;
+      display: flex;
+      justify-content: flex-end; /* гамбургер праворуч */
+      align-items: center;
+    }
+
+    body.dark-theme .navbar {
+      background: #222;
+    }
+
+    /* Бургер кнопка без підсвітки */
+    .burger {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid white;
+      font-size: 22px;
+      color: white;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: none;
+    }
+
+    .burger:hover,
+    .burger:focus {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      cursor: default;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 220px;
+      height: 100vh;
+      background: #444;
+      color: white;
+      padding: 20px;
+      transform: translateX(100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    body.dark-theme .side-menu {
+      background: #222;
+      color: #ddd;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Кнопки меню без підсвітки */
+    .side-menu button,
+    .side-menu a {
+      padding: 10px 15px;
+      background: #666;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: none;
+    }
+
+    .side-menu button:hover,
+    .side-menu button:focus,
+    .side-menu a:hover,
+    .side-menu a:focus {
+      background-color: #666;
+      color: white;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <button class="burger" onclick="toggleMenu()">☰</button>
+  </div>
+
+  <div class="side-menu" id="sideMenu">
+    <button onclick="toggleMenu()">✖ Закрити</button>
+    <button onclick="toggleTheme()">🌓 Змінити тему</button>
+    <a href="{% url 'post_list' %}">🏠 Головна</a>
+  </div>
+
+  <div class="container">
+    <div class="profile-box">
+      <h1>Профіль користувача</h1>
+
+      <p><strong>Ім'я користувача:</strong> {{ user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+
+      <p><a href="{% url 'edit_profile' %}">Редагувати профіль</a></p>
+      <p><a href="{% url 'post_list' %}">На головну</a></p>
+      <p><a href="{% url 'logout' %}">Вийти</a></p>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+      // збереження вибору теми
+      const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById('sideMenu');
+      menu.classList.toggle('open');
+    }
+
+    // Завантаження збереженої теми при завантаженні сторінки
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+  </script>
+
+</body>
+</html>

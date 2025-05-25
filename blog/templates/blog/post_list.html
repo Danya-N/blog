@@ -237,57 +237,61 @@
     <button onclick="toggleMenu()">✖ Закрити</button>
     <button onclick="toggleTheme()">🌓 Змінити тему</button>
     <a href="{% url 'add_post' %}">➕ Додати пост</a>
+    <a href="{% url 'register' %}">👤 Реєстрація</a>
+    <a href="{% url 'profile' %}">👤 Профіль</a>
   </div>
 
   <div class="container">
-    {% for post in posts %}
-      <div class="post" id="post-{{ post.id }}">
-        <form class="post-delete-form" action="{% url 'delete_post' post.id %}" method="post">
-          {% csrf_token %}
-          <button type="submit" class="delete-button" title="Видалити пост">🗑️</button>
-        </form>
-
-        <h2>{{ post.title }}</h2>
-        <p class="post-content">{{ post.content }}</p>
-
-        {% if post.image %}
-          <img src="{{ post.image.url }}" alt="Зображення">
-        {% endif %}
-
-        {% if post.video %}
-          <video controls>
-            <source src="{{ post.video.url }}" type="video/mp4">
-            Ваш браузер не підтримує відео.
-          </video>
-        {% endif %}
-
-        <div>
-          <button class="like-btn" id="like-btn-{{ post.id }}" onclick="toggleLike({{ post.id }})">❤️</button>
-          <span id="like-count-{{ post.id }}">{{ post.like_count }}</span> лайків
-        </div>
-
-        <div class="comment-section">
-          <h4>Коментарі:</h4>
-          {% for comment in post.comments.all %}
-            <div class="comment">
-              {{ comment.content }}
-              <form action="{% url 'delete_comment' comment.id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="delete-button" title="Видалити коментар">🗑️</button>
-              </form>
-            </div>
-          {% empty %}
-            <p>Коментарів ще немає.</p>
-          {% endfor %}
-
-          <form class="comment-form" action="{% url 'add_comment' post.id %}" method="post">
+    {% block content %}
+      {% for post in posts %}
+        <div class="post" id="post-{{ post.id }}">
+          <form class="post-delete-form" action="{% url 'delete_post' post.id %}" method="post">
             {% csrf_token %}
-            <input type="text" name="content" placeholder="Ваш коментар..." required>
-            <button type="submit">💬</button>
+            <button type="submit" class="delete-button" title="Видалити пост">🗑️</button>
           </form>
+
+          <h2>{{ post.title }}</h2>
+          <p class="post-content">{{ post.content }}</p>
+
+          {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Зображення">
+          {% endif %}
+
+          {% if post.video %}
+            <video controls>
+              <source src="{{ post.video.url }}" type="video/mp4">
+              Ваш браузер не підтримує відео.
+            </video>
+          {% endif %}
+
+          <div>
+            <button class="like-btn" id="like-btn-{{ post.id }}" onclick="toggleLike({{ post.id }})">❤️</button>
+            <span id="like-count-{{ post.id }}">{{ post.like_count }}</span> лайків
+          </div>
+
+          <div class="comment-section">
+            <h4>Коментарі:</h4>
+            {% for comment in post.comments.all %}
+              <div class="comment">
+                {{ comment.content }}
+                <form action="{% url 'delete_comment' comment.id %}" method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="delete-button" title="Видалити коментар">🗑️</button>
+                </form>
+              </div>
+            {% empty %}
+              <p>Коментарів ще немає.</p>
+            {% endfor %}
+
+            <form class="comment-form" action="{% url 'add_comment' post.id %}" method="post">
+              {% csrf_token %}
+              <input type="text" name="content" placeholder="Ваш коментар..." required>
+              <button type="submit">💬</button>
+            </form>
+          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    {% endblock %}
   </div>
 
   <script>
@@ -315,12 +319,18 @@
 
     function toggleLike(postId) {
       const likeBtn = document.getElementById(`like-btn-${postId}`);
-      fetch(`/like/${postId}/`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById(`like-count-${postId}`).textContent = data.likes;
-          likeBtn.classList.toggle('liked', data.liked);
-        });
+      const likeCountSpan = document.getElementById(`like-count-${postId}`);
+      let likeCount = parseInt(likeCountSpan.textContent);
+
+      if (likeBtn.classList.contains('liked')) {
+        likeBtn.classList.remove('liked');
+        likeCount--;
+      } else {
+        likeBtn.classList.add('liked');
+        likeCount++;
+      }
+      likeCountSpan.textContent = likeCount;
+      // Тут можна додати AJAX-запит для збереження лайку на сервері
     }
 
     function toggleMenu() {
@@ -328,5 +338,6 @@
       menu.classList.toggle('open');
     }
   </script>
+
 </body>
 </html>

@@ -2,6 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Post, Comment, Like
 from .forms import PostForm, CommentForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.models import User
 
 def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
@@ -37,17 +42,56 @@ def delete_comment(request, comment_id):
 
 def like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    session_key = request.session.session_key  # Отримуємо сесійний ключ користувача
+    session_key = request.session.session_key
     if not session_key:
-        request.session.create()  # Якщо немає сесійного ключа, створюємо новий
+        request.session.create()
+        session_key = request.session.session_key
 
-    # Перевірка, чи вже є лайк для цього поста
     like, created = Like.objects.get_or_create(post=post, session_key=session_key)
-    
-    if not created:  # Якщо лайк вже існує, видаляємо його
+    if not created:
         like.delete()
         liked = False
     else:
         liked = True
 
-    return JsonResponse({'likes': post.like_count(), 'liked': liked})
+    like_count = post.likes.count()
+    return JsonResponse({'liked': liked, 'like_count': like_count})
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Реєстрація пройшла успішно!')
+            return redirect('post_list')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+@login_required
+def profile_view(request):
+    # Показуємо дані поточного користувача
+    return render(request, 'blog/profile.html', {'user': request.user})
+
+@login_required
+def edit_profile_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        user = request.user
+
+        # Перевірка, чи ім'я унікальне (окрім поточного користувача)
+        if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+            messages.error(request, 'Це ім\'я користувача вже зайняте.')
+            return redirect('edit_profile')
+
+        user.username = username
+        user.email = email
+        user.save()
+
+        messages.success(request, 'Профіль успішно оновлено.')
+        return redirect('profile')
+
+    return render(request, 'blog/edit_profile.html', {'user': request.user})

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <title>Редагування профілю</title>
+</head>
+<body>
+    <h1>Редагування профілю</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Зберегти</button>
+    </form>
+
+    <p><a href="{% url 'profile' %}">Назад до профілю</a></p>
+    <p><a href="{% url 'post_list' %}">На головну</a></p>
+</body>
+</html>
