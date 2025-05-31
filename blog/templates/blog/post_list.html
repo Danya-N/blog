@@ -83,14 +83,16 @@
       margin-top: 20px;
     }
 
+    /* ОНОВЛЕНІ СТИЛІ ДЛЯ КАРТОЧОК ПОСТІВ — ДОДАНО ПІДСВІТКУ */
     .post {
       background-color: #f9f9f9;
       padding: 15px;
       margin-bottom: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 15px;
+      border: 2px solid #bb86fc; /* підсвітка рамкою */
+      box-shadow: 0 4px 15px rgba(187, 134, 252, 0.6); /* підсвітка тінню */
       position: relative;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
 
     .dark-theme .post {
@@ -237,7 +239,7 @@
     <button onclick="toggleMenu()">✖ Закрити</button>
     <button onclick="toggleTheme()">🌓 Змінити тему</button>
     <a href="{% url 'add_post' %}">➕ Додати пост</a>
-    <a href="{% url 'register' %}">👤 Реєстрація</a>
+    <a href="{% url 'register' %}">✍️ Реєстрація</a>
     <a href="{% url 'profile' %}">👤 Профіль</a>
   </div>
 

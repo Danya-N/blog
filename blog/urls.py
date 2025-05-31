@@ -18,4 +18,5 @@ urlpatterns = [
 
     # Вбудовані маршрути для авторизації (login, logout, password reset і т.д.)
     path('accounts/', include('django.contrib.auth.urls')),
+    
 ]

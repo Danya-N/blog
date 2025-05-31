@@ -18,7 +18,7 @@
 
     /* Темна тема */
     body.dark-theme {
-      background-color: #121212; /* темний фон сторінки */
+      background-color: #2c2c2c; /* світліший темний фон */
       color: #e0e0e0; /* світлий текст */
     }
 
@@ -79,6 +79,29 @@
 
     .profile-box a:hover,
     .profile-box a:focus {
+      background-color: transparent;
+      color: #bb86fc;
+      border-color: #bb86fc;
+      cursor: default;
+    }
+
+    /* Кнопка Вийти стилізована як посилання */
+    .profile-box-link-style {
+      background: none;
+      border: 2px solid #bb86fc;
+      color: #bb86fc;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: inherit;
+      font-family: inherit;
+      text-decoration: none;
+      transition: none;
+    }
+
+    .profile-box-link-style:hover,
+    .profile-box-link-style:focus {
       background-color: transparent;
       color: #bb86fc;
       border-color: #bb86fc;
@@ -193,9 +216,14 @@
       <p><strong>Ім'я користувача:</strong> {{ user.username }}</p>
       <p><strong>Email:</strong> {{ user.email }}</p>
 
-      <p><a href="{% url 'edit_profile' %}">Редагувати профіль</a></p>
       <p><a href="{% url 'post_list' %}">На головну</a></p>
-      <p><a href="{% url 'logout' %}">Вийти</a></p>
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="profile-box-link-style">
+          Вийти
+        </button>
+      </form>
+
     </div>
   </div>
 

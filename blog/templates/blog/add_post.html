@@ -103,20 +103,25 @@
 
         .form-container {
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
             background-color: #f9f9f9;
             transition: background-color 0.3s, color 0.3s;
             margin-top: 50px;
+            /* --- ДОДАНО ПІДСВІТКУ --- */
+            border: 2px solid #bb86fc;
+            box-shadow: 0 4px 15px rgba(187, 134, 252, 0.6);
         }
 
         .dark-theme .form-container {
             background-color: #3b3b3b;
+            border-color: #bb86fc;
+            box-shadow: 0 4px 20px rgba(187, 134, 252, 0.9);
         }
 
         .form-container h2 {
             text-align: center;
             font-size: 24px;
+            color: #bb86fc;
         }
 
         .form-container label {
@@ -216,9 +221,7 @@
 <body>
 
     <div class="navbar">
-        <div>
-
-        </div>
+        <div></div>
         <div style="display: flex; align-items: center;">
             <button class="burger" onclick="toggleMenu()">☰</button>
         </div>
